@@ -146,11 +146,34 @@ html, body {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
 }
+#bonusOverlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  pointer-events: none;
+}
+#bonusOverlay.active { display: flex; }
+#bonusOverlay img {
+  width: 72vw;
+  max-width: 340px;
+  border-radius: 16px;
+  box-shadow: 0 12px 60px rgba(255,215,0,0.55);
+  animation: bonusPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes bonusPop {
+  from { opacity: 0; transform: scale(0.3) rotate(-8deg); }
+  to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
 </style>
 </head>
 <body>
 <canvas id="gameCanvas"></canvas>
 <div id="loadingText">加载中...</div>
+<div id="bonusOverlay"><img src="assets/bonus.jpg" alt="惊喜"></div>
 
 <div id="hud">
   <div class="hud-box">得分: <span id="scoreVal">0</span></div>
@@ -196,6 +219,9 @@ html, body {
   let nextLevel = 0;
   let dangerTimer = 0;
   let pointerX = 0;
+  let dropCooldown = 0;
+  let paused = false;
+  let bonusShown = false;
   let images = [];
   let LEVELS = [];
   let groundY = 0;
@@ -213,17 +239,20 @@ html, body {
     canvas.height = H;
     const base = Math.min(W, 500);
     LEVELS = [
-      { r: base * 0.042, img: 0 },
-      { r: base * 0.058, img: 1 },
-      { r: base * 0.078, img: 2 },
-      { r: base * 0.102, img: 3 },
-      { r: base * 0.132, img: 4 },
-      { r: base * 0.168, img: 0, glow: 'gold' },
-      { r: base * 0.208, img: 1, glow: 'gold' },
-      { r: base * 0.252, img: 2, glow: 'gold' },
-      { r: base * 0.300, img: 3, glow: 'gold' },
-      { r: base * 0.352, img: 4, glow: 'gold' },
-      { r: base * 0.408, img: 0, glow: 'rainbow' },
+      { r: base * 0.034, img: 0 },
+      { r: base * 0.046, img: 1 },
+      { r: base * 0.060, img: 2 },
+      { r: base * 0.076, img: 3 },
+      { r: base * 0.094, img: 4 },
+      { r: base * 0.114, img: 5 },
+      { r: base * 0.136, img: 6 },
+      { r: base * 0.160, img: 7 },
+      { r: base * 0.186, img: 0, glow: 'gold' },
+      { r: base * 0.214, img: 1, glow: 'gold' },
+      { r: base * 0.244, img: 2, glow: 'gold' },
+      { r: base * 0.276, img: 3, glow: 'gold' },
+      { r: base * 0.310, img: 4, glow: 'gold' },
+      { r: base * 0.346, img: 5, glow: 'rainbow' },
     ];
     groundY = H - base * 0.02;
     dangerY = base * 0.36;
@@ -271,7 +300,7 @@ html, body {
   }
 
   function loadImages() {
-    return Promise.all([0,1,2,3,4].map(i => new Promise((res, rej) => {
+    return Promise.all([0,1,2,3,4,5,6,7].map(i => new Promise((res, rej) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => res(img);
@@ -311,6 +340,8 @@ html, body {
   }
 
   function spawnBall(x) {
+    if (dropCooldown > 0) return;
+    dropCooldown = 0.5;
     const r = LEVELS[currentLevel].r;
     x = Math.max(r, Math.min(W - r, x));
     const b = new Ball(x, spawnY, currentLevel);
@@ -344,7 +375,7 @@ html, body {
       const s = ball.r * 2.2;
       c.drawImage(img, ball.x - s/2, ball.y - s/2, s, s);
     } else {
-      const hues = [20, 40, 60, 180, 300, 20, 40, 60, 180, 300, 0];
+      const hues = [20, 40, 60, 180, 300, 120, 260, 340, 20, 40, 60, 180, 300, 120];
       c.fillStyle = 'hsl(' + hues[ball.level] + ',70%,60%)';
       c.fill();
     }
@@ -447,7 +478,7 @@ html, body {
       for (let j = i + 1; j < balls.length; j++) {
         if (remove.has(j)) continue;
         const a = balls[i], b = balls[j];
-        if (a.level !== b.level || a.level >= 10) continue;
+        if (a.level !== b.level || a.level >= LEVELS.length - 1) continue;
         const dx = b.x - a.x, dy = b.y - a.y;
         const dist = Math.sqrt(dx*dx + dy*dy);
         if (dist < (a.r + b.r) * 1.02) {
@@ -469,7 +500,21 @@ html, body {
       balls = balls.filter((_, i) => !remove.has(i));
       balls.push(...add);
       document.getElementById('scoreVal').textContent = score;
+      if (!bonusShown && score >= 200) triggerBonus();
     }
+  }
+
+  function triggerBonus() {
+    bonusShown = true;
+    paused = true;
+    document.getElementById('bonusOverlay').classList.add('active');
+    playTone(523, 0.25, 'sine', 0.12);
+    setTimeout(() => playTone(659, 0.25, 'sine', 0.12), 150);
+    setTimeout(() => playTone(784, 0.35, 'sine', 0.12), 300);
+    setTimeout(() => {
+      document.getElementById('bonusOverlay').classList.remove('active');
+      paused = false;
+    }, 2000);
   }
 
   function updateParticles(dt) {
@@ -549,7 +594,8 @@ html, body {
   }
 
   function update(dt) {
-    if (state !== STATE.PLAYING) return;
+    if (state !== STATE.PLAYING || paused) return;
+    if (dropCooldown > 0) dropCooldown -= dt;
     updatePhysics(dt);
     checkMerge();
     updateParticles(dt);
@@ -569,6 +615,8 @@ html, body {
   function startGame() {
     initAudio();
     balls = []; particles = []; score = 0; dangerTimer = 0;
+    dropCooldown = 0; paused = false; bonusShown = false;
+    document.getElementById('bonusOverlay').classList.remove('active');
     currentLevel = randLevel(); nextLevel = randLevel();
     document.getElementById('scoreVal').textContent = '0';
     document.getElementById('highVal').textContent = highScore;
