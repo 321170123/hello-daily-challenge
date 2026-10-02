@@ -352,7 +352,7 @@ html, body {
       html += '<div class="board-empty" style="color:#e67e22;font-weight:700;">你的成绩已记录，当前排名 第' + rank + ' 位</div>';
     }
     let highlighted = false;
-    html += list.slice(0, 20).map((e, i) => {
+    html += list.slice(0, 50).map((e, i) => {
       const isMe = !highlighted && myScore != null && myName != null && e.score === myScore && e.name === myName;
       if (isMe) highlighted = true;
       const style = isMe ? ' style="background:#fff3d6;font-weight:800;"' : '';
