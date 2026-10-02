@@ -127,6 +127,13 @@ html, body {
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
+.hud-btn {
+  pointer-events: auto;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  color: #e74c3c;
+}
 #nextPreview {
   display: flex;
   align-items: center;
@@ -234,6 +241,7 @@ html, body {
   <div class="hud-box">得分: <span id="scoreVal">0</span></div>
   <div class="hud-box" id="nextPreview">下一个: <canvas id="nextCanvas" width="64" height="64"></canvas></div>
   <div class="hud-box">最高分: <span id="highVal">0</span></div>
+  <button class="hud-box hud-btn" id="quitBtn">结束</button>
 </div>
 
 <div id="uiLayer">
@@ -800,7 +808,8 @@ html, body {
     document.getElementById('overScreen').classList.add('active');
     const boardEl = document.getElementById('overBoard');
     boardEl.innerHTML = '<div class="board-empty">正在提交成绩...</div>';
-    submitScore(playerName, score).then(() => fetchBoard()).then(list => renderBoard(boardEl, list));
+    (score > 0 ? submitScore(playerName, score) : Promise.resolve())
+      .then(() => fetchBoard()).then(list => renderBoard(boardEl, list));
   }
 
   function handleInput(x) {
@@ -826,6 +835,9 @@ html, body {
 
   document.getElementById('startBtn').addEventListener('click', startGame);
   document.getElementById('restartBtn').addEventListener('click', startGame);
+  document.getElementById('quitBtn').addEventListener('click', () => {
+    if (state === STATE.PLAYING) endGame();
+  });
   document.getElementById('boardBtn').addEventListener('click', () => {
     document.getElementById('menuScreen').classList.remove('active');
     document.getElementById('boardScreen').classList.add('active');
