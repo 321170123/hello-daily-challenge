@@ -338,17 +338,27 @@ html, body {
       .then(r => r.json())
       .then(data => {
         if (!data) return [];
-        return Object.values(data).sort((a, b) => b.score - a.score).slice(0, 20);
+        return Object.values(data).sort((a, b) => b.score - a.score);
       })
       .catch(() => null);
   }
 
-  function renderBoard(el, list) {
+  function renderBoard(el, list, myScore, myName) {
     if (list === null) { el.innerHTML = '<div class="board-empty">排行榜加载失败</div>'; return; }
     if (!list.length) { el.innerHTML = '<div class="board-empty">暂无记录，快来拿第一！</div>'; return; }
-    el.innerHTML = list.map((e, i) =>
-      '<div class="board-row"><span class="rank">' + (i+1) + '</span><span class="name">' + escHtml(e.name) + '</span><span class="pts">' + e.score + '</span></div>'
-    ).join('');
+    let html = '';
+    if (myScore != null && myScore > 0) {
+      const rank = list.filter(e => e.score > myScore).length + 1;
+      html += '<div class="board-empty" style="color:#e67e22;font-weight:700;">你的成绩已记录，当前排名 第' + rank + ' 位</div>';
+    }
+    let highlighted = false;
+    html += list.slice(0, 20).map((e, i) => {
+      const isMe = !highlighted && myScore != null && myName != null && e.score === myScore && e.name === myName;
+      if (isMe) highlighted = true;
+      const style = isMe ? ' style="background:#fff3d6;font-weight:800;"' : '';
+      return '<div class="board-row"' + style + '><span class="rank">' + (i+1) + '</span><span class="name">' + escHtml(e.name) + '</span><span class="pts">' + e.score + '</span></div>';
+    }).join('');
+    el.innerHTML = html;
   }
 
   try { highScore = parseInt(localStorage.getItem('syn_high') || '0'); } catch(e) {}
@@ -809,7 +819,7 @@ html, body {
     const boardEl = document.getElementById('overBoard');
     boardEl.innerHTML = '<div class="board-empty">正在提交成绩...</div>';
     (score > 0 ? submitScore(playerName, score) : Promise.resolve())
-      .then(() => fetchBoard()).then(list => renderBoard(boardEl, list));
+      .then(() => fetchBoard()).then(list => renderBoard(boardEl, list, score, playerName));
   }
 
   function handleInput(x) {
