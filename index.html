@@ -168,12 +168,50 @@ html, body {
   from { opacity: 0; transform: scale(0.3) rotate(-8deg); }
   to { opacity: 1; transform: scale(1) rotate(0deg); }
 }
+#nameInput {
+  width: 240px;
+  padding: 12px 18px;
+  font-size: 16px;
+  border: 2px solid #ffb74d;
+  border-radius: 24px;
+  outline: none;
+  text-align: center;
+  margin-bottom: 4px;
+  background: #fffdf5;
+}
+#nameInput:focus { border-color: #ff8f00; }
+.btn-secondary {
+  background: linear-gradient(135deg, #90caf9 0%, #42a5f5 100%);
+  box-shadow: 0 6px 20px rgba(66,165,245,0.3);
+  font-size: 15px;
+  padding: 10px 36px;
+}
+.board {
+  width: 100%;
+  max-height: 150px;
+  overflow-y: auto;
+  margin: 6px 0;
+  font-size: 14px;
+}
+.board-large { max-height: 320px; min-width: 260px; }
+.board-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 12px;
+  border-bottom: 1px solid #f0e6d0;
+}
+.board-row:first-child { font-weight: 800; color: #d35400; }
+.board-row .rank { width: 30px; text-align: left; }
+.board-row .name { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board-row .pts { font-weight: 700; }
+.board-empty { color: #999; padding: 12px; text-align: center; font-size: 13px; }
 </style>
 </head>
 <body>
 <canvas id="gameCanvas"></canvas>
 <div id="loadingText">加载中...</div>
 <div id="bonusOverlay"><img src="assets/bonus.jpg" alt="惊喜"></div>
+<audio id="bgm" src="assets/bgm.m4a" loop preload="auto"></audio>
 
 <div id="hud">
   <div class="hud-box">得分: <span id="scoreVal">0</span></div>
@@ -186,7 +224,9 @@ html, body {
     <div class="title">合成大挑战</div>
     <div class="subtitle">把相同的人合成更高级！</div>
     <div class="highscore-display">最高分: <span id="menuHigh">0</span></div>
+    <input id="nameInput" type="text" maxlength="12" placeholder="输入昵称上排行榜（可留空）">
     <button class="btn" id="startBtn">开始游戏</button>
+    <button class="btn btn-secondary" id="boardBtn">查看排行榜</button>
     <div class="share-tip">点击屏幕上方投放角色<br>相同角色相遇会合成升级</div>
   </div>
 
@@ -196,8 +236,15 @@ html, body {
     <div class="score-display" id="finalScore">0</div>
     <div id="recordBadge" class="new-record" style="display:none;">新纪录！</div>
     <div class="highscore-display">最高分: <span id="overHigh">0</span></div>
+    <div id="overBoard" class="board"></div>
     <button class="btn" id="restartBtn">再来一次</button>
     <div class="share-tip">点击右上角「···」<br>分享给好友一起玩</div>
+  </div>
+
+  <div id="boardScreen" class="screen">
+    <div class="title">排行榜</div>
+    <div id="menuBoard" class="board board-large"></div>
+    <button class="btn" id="boardBackBtn">返回</button>
   </div>
 </div>
 
@@ -229,6 +276,55 @@ html, body {
   let spawnY = 0;
   let audioCtx = null;
   let animId = 0;
+  let playerName = '';
+
+  // ===== Firebase 配置（创建项目后把下面两个值替换掉）=====
+  const FIREBASE_DB_URL = ''; // 例如 https://xxx-default-rtdb.firebaseio.com
+  const BOARD_PATH = 'leaderboard';
+  // ========================================================
+
+  const bgm = document.getElementById('bgm');
+  bgm.volume = 0.5;
+  let bgmStarted = false;
+  function tryPlayBgm() {
+    if (bgmStarted) return;
+    bgmStarted = true;
+    bgm.play().catch(() => { bgmStarted = false; });
+  }
+  document.addEventListener('touchstart', tryPlayBgm, { once: false });
+  document.addEventListener('mousedown', tryPlayBgm, { once: false });
+
+  function escHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function submitScore(name, pts) {
+    if (!FIREBASE_DB_URL) return Promise.resolve();
+    return fetch(FIREBASE_DB_URL + '/' + BOARD_PATH + '.json', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, score: pts, t: Date.now() })
+    }).catch(() => {});
+  }
+
+  function fetchBoard() {
+    if (!FIREBASE_DB_URL) return Promise.resolve(null);
+    return fetch(FIREBASE_DB_URL + '/' + BOARD_PATH + '.json?orderBy="score"&limitToLast=20')
+      .then(r => r.json())
+      .then(data => {
+        if (!data) return [];
+        return Object.values(data).sort((a, b) => b.score - a.score).slice(0, 20);
+      })
+      .catch(() => null);
+  }
+
+  function renderBoard(el, list) {
+    if (list === null) { el.innerHTML = '<div class="board-empty">排行榜加载失败</div>'; return; }
+    if (!list.length) { el.innerHTML = '<div class="board-empty">暂无记录，快来拿第一！</div>'; return; }
+    el.innerHTML = list.map((e, i) =>
+      '<div class="board-row"><span class="rank">' + (i+1) + '</span><span class="name">' + escHtml(e.name) + '</span><span class="pts">' + e.score + '</span></div>'
+    ).join('');
+  }
 
   try { highScore = parseInt(localStorage.getItem('syn_high') || '0'); } catch(e) {}
 
@@ -239,20 +335,22 @@ html, body {
     canvas.height = H;
     const base = Math.min(W, 500);
     LEVELS = [
-      { r: base * 0.034, img: 0 },
-      { r: base * 0.046, img: 1 },
-      { r: base * 0.060, img: 2 },
-      { r: base * 0.076, img: 3 },
-      { r: base * 0.094, img: 4 },
-      { r: base * 0.114, img: 5 },
-      { r: base * 0.136, img: 6 },
-      { r: base * 0.160, img: 7 },
-      { r: base * 0.186, img: 0, glow: 'gold' },
-      { r: base * 0.214, img: 1, glow: 'gold' },
-      { r: base * 0.244, img: 2, glow: 'gold' },
-      { r: base * 0.276, img: 3, glow: 'gold' },
-      { r: base * 0.310, img: 4, glow: 'gold' },
-      { r: base * 0.346, img: 5, glow: 'rainbow' },
+      { r: base * 0.032, img: 0 },
+      { r: base * 0.043, img: 1 },
+      { r: base * 0.056, img: 2 },
+      { r: base * 0.070, img: 3 },
+      { r: base * 0.086, img: 4 },
+      { r: base * 0.104, img: 5 },
+      { r: base * 0.124, img: 6 },
+      { r: base * 0.146, img: 7 },
+      { r: base * 0.170, img: 8 },
+      { r: base * 0.196, img: 9 },
+      { r: base * 0.224, img: 0, glow: 'gold' },
+      { r: base * 0.254, img: 1, glow: 'gold' },
+      { r: base * 0.286, img: 2, glow: 'gold' },
+      { r: base * 0.318, img: 3, glow: 'gold' },
+      { r: base * 0.350, img: 4, glow: 'gold' },
+      { r: base * 0.382, img: 5, glow: 'rainbow' },
     ];
     groundY = H - base * 0.02;
     dangerY = base * 0.36;
@@ -300,7 +398,7 @@ html, body {
   }
 
   function loadImages() {
-    return Promise.all([0,1,2,3,4,5,6,7].map(i => new Promise((res, rej) => {
+    return Promise.all([0,1,2,3,4,5,6,7,8,9].map(i => new Promise((res, rej) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => res(img);
@@ -375,7 +473,7 @@ html, body {
       const s = ball.r * 2.2;
       c.drawImage(img, ball.x - s/2, ball.y - s/2, s, s);
     } else {
-      const hues = [20, 40, 60, 180, 300, 120, 260, 340, 20, 40, 60, 180, 300, 120];
+      const hues = [20, 40, 60, 180, 300, 120, 260, 340, 80, 200, 20, 40, 60, 180, 300, 120];
       c.fillStyle = 'hsl(' + hues[ball.level] + ',70%,60%)';
       c.fill();
     }
@@ -614,6 +712,8 @@ html, body {
 
   function startGame() {
     initAudio();
+    tryPlayBgm();
+    playerName = document.getElementById('nameInput').value.trim().slice(0, 12) || '神秘玩家';
     balls = []; particles = []; score = 0; dangerTimer = 0;
     dropCooldown = 0; paused = false; bonusShown = false;
     document.getElementById('bonusOverlay').classList.remove('active');
@@ -642,6 +742,9 @@ html, body {
     document.getElementById('recordBadge').style.display = isNew ? 'block' : 'none';
     document.getElementById('hud').classList.remove('active');
     document.getElementById('overScreen').classList.add('active');
+    const boardEl = document.getElementById('overBoard');
+    boardEl.innerHTML = '<div class="board-empty">正在提交成绩...</div>';
+    submitScore(playerName, score).then(() => fetchBoard()).then(list => renderBoard(boardEl, list));
   }
 
   function handleInput(x) {
@@ -667,6 +770,21 @@ html, body {
 
   document.getElementById('startBtn').addEventListener('click', startGame);
   document.getElementById('restartBtn').addEventListener('click', startGame);
+  document.getElementById('boardBtn').addEventListener('click', () => {
+    document.getElementById('menuScreen').classList.remove('active');
+    document.getElementById('boardScreen').classList.add('active');
+    const el = document.getElementById('menuBoard');
+    el.innerHTML = '<div class="board-empty">加载中...</div>';
+    fetchBoard().then(list => renderBoard(el, list));
+  });
+  document.getElementById('boardBackBtn').addEventListener('click', () => {
+    document.getElementById('boardScreen').classList.remove('active');
+    document.getElementById('menuScreen').classList.add('active');
+  });
+  try { document.getElementById('nameInput').value = localStorage.getItem('syn_name') || ''; } catch(e) {}
+  document.getElementById('nameInput').addEventListener('change', e => {
+    try { localStorage.setItem('syn_name', e.target.value.trim().slice(0, 12)); } catch(err) {}
+  });
 
   window.addEventListener('resize', () => {
     resize();
