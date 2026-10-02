@@ -205,12 +205,29 @@ html, body {
 .board-row .name { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .board-row .pts { font-weight: 700; }
 .board-empty { color: #999; padding: 12px; text-align: center; font-size: 13px; }
+#toast {
+  position: absolute;
+  top: 16%; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.72);
+  color: #fff;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 22px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  z-index: 60;
+}
+#toast.active { opacity: 1; }
 </style>
 </head>
 <body>
 <canvas id="gameCanvas"></canvas>
 <div id="loadingText">加载中...</div>
 <div id="bonusOverlay"><img src="assets/bonus.jpg" alt="惊喜"></div>
+<div id="toast"></div>
 <audio id="bgm" src="assets/bgm.m4a" loop preload="auto"></audio>
 
 <div id="hud">
@@ -227,7 +244,7 @@ html, body {
     <input id="nameInput" type="text" maxlength="12" placeholder="输入昵称上排行榜（可留空）">
     <button class="btn" id="startBtn">开始游戏</button>
     <button class="btn btn-secondary" id="boardBtn">查看排行榜</button>
-    <div class="share-tip">点击屏幕上方投放角色<br>相同角色相遇会合成升级</div>
+    <div class="share-tip">点击屏幕上方投放角色<br>相同角色相遇会合成升级<br>玩到一半退出，成绩也会自动记录</div>
   </div>
 
   <div id="overScreen" class="screen">
@@ -335,25 +352,27 @@ html, body {
     canvas.height = H;
     const base = Math.min(W, 500);
     LEVELS = [
-      { r: base * 0.032, img: 0 },
-      { r: base * 0.043, img: 1 },
-      { r: base * 0.056, img: 2 },
-      { r: base * 0.070, img: 3 },
-      { r: base * 0.086, img: 4 },
-      { r: base * 0.104, img: 5 },
-      { r: base * 0.124, img: 6 },
-      { r: base * 0.146, img: 7 },
-      { r: base * 0.170, img: 8 },
-      { r: base * 0.196, img: 9 },
-      { r: base * 0.224, img: 0, glow: 'gold' },
-      { r: base * 0.254, img: 1, glow: 'gold' },
-      { r: base * 0.286, img: 2, glow: 'gold' },
-      { r: base * 0.318, img: 3, glow: 'gold' },
-      { r: base * 0.350, img: 4, glow: 'gold' },
-      { r: base * 0.382, img: 5, glow: 'rainbow' },
+      { r: base * 0.0192, img: 10 },
+      { r: base * 0.0243, img: 11 },
+      { r: base * 0.0304, img: 0 },
+      { r: base * 0.0409, img: 1 },
+      { r: base * 0.0532, img: 2 },
+      { r: base * 0.0665, img: 3 },
+      { r: base * 0.0817, img: 4 },
+      { r: base * 0.0988, img: 5 },
+      { r: base * 0.1178, img: 6 },
+      { r: base * 0.1387, img: 7 },
+      { r: base * 0.1615, img: 8 },
+      { r: base * 0.1862, img: 9 },
+      { r: base * 0.2128, img: 0, glow: 'gold' },
+      { r: base * 0.2413, img: 1, glow: 'gold' },
+      { r: base * 0.2717, img: 2, glow: 'gold' },
+      { r: base * 0.3021, img: 3, glow: 'gold' },
+      { r: base * 0.3325, img: 4, glow: 'gold' },
+      { r: base * 0.3629, img: 5, glow: 'rainbow' },
     ];
     groundY = H - base * 0.02;
-    dangerY = base * 0.36;
+    dangerY = base * 0.32;
     spawnY = dangerY - base * 0.18;
     pointerX = W / 2;
   }
@@ -398,7 +417,7 @@ html, body {
   }
 
   function loadImages() {
-    return Promise.all([0,1,2,3,4,5,6,7,8,9].map(i => new Promise((res, rej) => {
+    return Promise.all([0,1,2,3,4,5,6,7,8,9,10,11].map(i => new Promise((res, rej) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => res(img);
@@ -433,7 +452,7 @@ html, body {
   }
 
   function randLevel() {
-    const cap = Math.min(4, 1 + Math.floor(score / 80));
+    const cap = Math.min(6, 1 + Math.floor(score / 80));
     return Math.floor(Math.random() * (cap + 1));
   }
 
@@ -473,7 +492,7 @@ html, body {
       const s = ball.r * 2.2;
       c.drawImage(img, ball.x - s/2, ball.y - s/2, s, s);
     } else {
-      const hues = [20, 40, 60, 180, 300, 120, 260, 340, 80, 200, 20, 40, 60, 180, 300, 120];
+      const hues = [45, 110, 20, 40, 60, 180, 300, 120, 260, 340, 80, 200, 20, 40, 60, 180, 300, 120];
       c.fillStyle = 'hsl(' + hues[ball.level] + ',70%,60%)';
       c.fill();
     }
@@ -519,7 +538,8 @@ html, body {
     const steps = 8;
     const sdt = dt / steps;
     const gravity = 1400;
-    const damping = Math.pow(0.985, sdt * 60);
+    const damping = Math.pow(0.97, sdt * 60);
+    const vxDamp = Math.pow(0.70, sdt * 60);
 
     for (let s = 0; s < steps; s++) {
       for (let b of balls) {
@@ -528,6 +548,7 @@ html, body {
         b.y += b.vy * sdt;
         b.vx *= damping;
         b.vy *= damping;
+        b.vx *= vxDamp;
         if (b.cooldown > 0) b.cooldown -= sdt;
       }
 
@@ -550,7 +571,7 @@ html, body {
             const dvx = b.vx - a.vx, dvy = b.vy - a.vy;
             const vn = dvx * nx + dvy * ny;
             if (vn < 0) {
-              const e = 0.25;
+              const e = 0.1;
               const imp = -(1 + e) * vn / (1/a.mass + 1/b.mass);
               const ix = imp * nx, iy = imp * ny;
               a.vx -= ix / a.mass; a.vy -= iy / a.mass;
@@ -561,9 +582,9 @@ html, body {
       }
 
       for (let b of balls) {
-        if (b.x < b.r) { b.x = b.r; b.vx *= -0.3; }
-        if (b.x > W - b.r) { b.x = W - b.r; b.vx *= -0.3; }
-        if (b.y > groundY - b.r) { b.y = groundY - b.r; b.vy *= -0.2; b.vx *= 0.9; }
+        if (b.x < b.r) { b.x = b.r; b.vx *= -0.1; }
+        if (b.x > W - b.r) { b.x = W - b.r; b.vx *= -0.1; }
+        if (b.y > groundY - b.r) { b.y = groundY - b.r; b.vy *= -0.05; b.vx *= 0.5; }
       }
     }
   }
@@ -633,7 +654,7 @@ html, body {
     }
     if (above) {
       dangerTimer += dt;
-      if (dangerTimer > 1.5) {
+      if (dangerTimer > 2.0) {
         endGame();
         return;
       }
@@ -710,6 +731,35 @@ html, body {
     animId = requestAnimationFrame(loop);
   }
 
+  // 中途退出时保存成绩到 localStorage，下次打开自动提交
+  function saveExitScore() {
+    if (state !== STATE.PLAYING || score <= 0) return;
+    try {
+      localStorage.setItem('syn_exitScore', JSON.stringify({
+        name: playerName || '神秘玩家',
+        score: score,
+        t: Date.now()
+      }));
+    } catch(e) {}
+  }
+  window.addEventListener('beforeunload', saveExitScore);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') saveExitScore();
+  });
+
+  // 启动时检查是否有上次退出的成绩，有则提交并清除
+  function submitPendingExitScore() {
+    try {
+      const raw = localStorage.getItem('syn_exitScore');
+      if (!raw) return;
+      const rec = JSON.parse(raw);
+      if (rec && rec.score > 0) {
+        submitScore(rec.name, rec.score);
+      }
+      localStorage.removeItem('syn_exitScore');
+    } catch(e) {}
+  }
+
   function startGame() {
     initAudio();
     tryPlayBgm();
@@ -718,6 +768,7 @@ html, body {
     dropCooldown = 0; paused = false; bonusShown = false;
     document.getElementById('bonusOverlay').classList.remove('active');
     currentLevel = randLevel(); nextLevel = randLevel();
+    try { localStorage.removeItem('syn_exitScore'); } catch(e) {}
     document.getElementById('scoreVal').textContent = '0';
     document.getElementById('highVal').textContent = highScore;
     drawNextPreview();
@@ -725,6 +776,11 @@ html, body {
     document.getElementById('menuScreen').classList.remove('active');
     document.getElementById('overScreen').classList.remove('active');
     document.getElementById('hud').classList.add('active');
+    // 开局提示：中途退出也记录成绩
+    const toast = document.getElementById('toast');
+    toast.textContent = '玩到一半退出，成绩也会自动记录';
+    toast.classList.add('active');
+    setTimeout(() => toast.classList.remove('active'), 3000);
   }
 
   function endGame() {
@@ -792,6 +848,7 @@ html, body {
   });
 
   resize();
+  submitPendingExitScore();
   loadImages().then(() => {
     document.getElementById('loadingText').style.display = 'none';
     document.getElementById('menuHigh').textContent = highScore;
