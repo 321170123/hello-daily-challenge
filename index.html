@@ -279,7 +279,7 @@ html, body {
   let playerName = '';
 
   // ===== Firebase 配置（创建项目后把下面两个值替换掉）=====
-  const FIREBASE_DB_URL = ''; // 例如 https://xxx-default-rtdb.firebaseio.com
+  const FIREBASE_DB_URL = 'https://project-9110840191531808787-default-rtdb.asia-southeast1.firebasedatabase.app';
   const BOARD_PATH = 'leaderboard';
   // ========================================================
 
@@ -309,7 +309,7 @@ html, body {
 
   function fetchBoard() {
     if (!FIREBASE_DB_URL) return Promise.resolve(null);
-    return fetch(FIREBASE_DB_URL + '/' + BOARD_PATH + '.json?orderBy="score"&limitToLast=20')
+    return fetch(FIREBASE_DB_URL + '/' + BOARD_PATH + '.json')
       .then(r => r.json())
       .then(data => {
         if (!data) return [];
