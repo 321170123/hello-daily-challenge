@@ -295,6 +295,7 @@ html, body {
   let paused = false;
   let bonusShown = false;
   let images = [];
+  let bgImg = null;
   let LEVELS = [];
   let groundY = 0;
   let dangerY = 0;
@@ -372,21 +373,22 @@ html, body {
     LEVELS = [
       { r: base * 0.0768, img: 10 },
       { r: base * 0.0972, img: 11 },
-      { r: base * 0.1200, img: 0 },
-      { r: base * 0.1450, img: 1 },
-      { r: base * 0.1700, img: 2 },
-      { r: base * 0.1950, img: 3 },
-      { r: base * 0.2200, img: 4 },
-      { r: base * 0.2450, img: 5 },
-      { r: base * 0.2700, img: 6 },
-      { r: base * 0.2950, img: 7 },
-      { r: base * 0.3200, img: 8 },
-      { r: base * 0.3450, img: 9 },
-      { r: base * 0.3700, img: 0, glow: 'gold' },
-      { r: base * 0.3950, img: 1, glow: 'gold' },
-      { r: base * 0.4200, img: 2, glow: 'gold' },
-      { r: base * 0.4450, img: 3, glow: 'gold' },
-      { r: base * 0.4700, img: 4, glow: 'gold' },
+      { r: base * 0.1200, img: 12 },
+      { r: base * 0.1438, img: 0 },
+      { r: base * 0.1675, img: 1 },
+      { r: base * 0.1913, img: 2 },
+      { r: base * 0.2150, img: 3 },
+      { r: base * 0.2388, img: 4 },
+      { r: base * 0.2625, img: 5 },
+      { r: base * 0.2863, img: 6 },
+      { r: base * 0.3100, img: 7 },
+      { r: base * 0.3338, img: 8 },
+      { r: base * 0.3575, img: 9 },
+      { r: base * 0.3813, img: 0, glow: 'gold' },
+      { r: base * 0.4050, img: 1, glow: 'gold' },
+      { r: base * 0.4288, img: 2, glow: 'gold' },
+      { r: base * 0.4525, img: 3, glow: 'gold' },
+      { r: base * 0.4763, img: 4, glow: 'gold' },
       { r: base * 0.5000, img: 5, glow: 'rainbow' },
     ];
     groundY = H - base * 0.02;
@@ -435,13 +437,21 @@ html, body {
   }
 
   function loadImages() {
-    return Promise.all([0,1,2,3,4,5,6,7,8,9,10,11].map(i => new Promise((res, rej) => {
+    return Promise.all([0,1,2,3,4,5,6,7,8,9,10,11,12].map(i => new Promise((res, rej) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => res(img);
       img.onerror = () => { console.warn('图片加载失败: p'+i); res(null); };
       img.src = 'assets/p' + i + '.jpg';
-    }))).then(imgs => { images = imgs; });
+    }))).then(imgs => {
+      images = imgs;
+      return new Promise(res => {
+        const bg = new Image();
+        bg.onload = () => { bgImg = bg; res(); };
+        bg.onerror = () => res();
+        bg.src = 'assets/bg.jpg';
+      });
+    });
   }
 
   class Ball {
@@ -684,7 +694,20 @@ html, body {
   function render() {
     ctx.clearRect(0, 0, W, H);
 
-    ctx.fillStyle = '#e8dcc0';
+    // 背景图（cover 铺满），未加载时用纯色
+    if (bgImg) {
+      const ir = bgImg.width / bgImg.height;
+      const cr = W / H;
+      let dw, dh, dx, dy;
+      if (ir > cr) { dh = H; dw = H * ir; dx = (W - dw) / 2; dy = 0; }
+      else { dw = W; dh = W / ir; dx = 0; dy = (H - dh) / 2; }
+      ctx.drawImage(bgImg, dx, dy, dw, dh);
+      // 白色薄雾，保证球和危险线清晰
+      ctx.fillStyle = 'rgba(253,246,227,0.32)';
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    ctx.fillStyle = 'rgba(232,220,192,0.75)';
     ctx.fillRect(0, groundY, W, H - groundY);
 
     ctx.setLineDash([8, 8]);
