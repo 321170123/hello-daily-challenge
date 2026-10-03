@@ -371,28 +371,26 @@ html, body {
     canvas.height = H;
     const base = Math.min(W, 500);
     LEVELS = [
-      { r: base * 0.0768, img: 10 },
-      { r: base * 0.0972, img: 11 },
-      { r: base * 0.1200, img: 12 },
-      { r: base * 0.1438, img: 0 },
-      { r: base * 0.1675, img: 1 },
-      { r: base * 0.1913, img: 2 },
-      { r: base * 0.2150, img: 3 },
-      { r: base * 0.2388, img: 4 },
-      { r: base * 0.2625, img: 5 },
-      { r: base * 0.2863, img: 6 },
-      { r: base * 0.3100, img: 7 },
-      { r: base * 0.3338, img: 8 },
-      { r: base * 0.3575, img: 9 },
-      { r: base * 0.3813, img: 0, glow: 'gold' },
-      { r: base * 0.4050, img: 1, glow: 'gold' },
-      { r: base * 0.4288, img: 2, glow: 'gold' },
-      { r: base * 0.4525, img: 3, glow: 'gold' },
-      { r: base * 0.4763, img: 4, glow: 'gold' },
-      { r: base * 0.5000, img: 5, glow: 'rainbow' },
+      { r: base * 0.030, img: 12 },
+      { r: base * 0.036, img: 0 },
+      { r: base * 0.043, img: 1 },
+      { r: base * 0.051, img: 2 },
+      { r: base * 0.061, img: 3 },
+      { r: base * 0.073, img: 4 },
+      { r: base * 0.087, img: 5 },
+      { r: base * 0.104, img: 6 },
+      { r: base * 0.124, img: 7 },
+      { r: base * 0.148, img: 8 },
+      { r: base * 0.177, img: 9 },
+      { r: base * 0.211, img: 0, glow: 'gold' },
+      { r: base * 0.252, img: 1, glow: 'gold' },
+      { r: base * 0.300, img: 2, glow: 'gold' },
+      { r: base * 0.358, img: 3, glow: 'gold' },
+      { r: base * 0.427, img: 4, glow: 'gold' },
+      { r: base * 0.500, img: 5, glow: 'rainbow' },
     ];
     groundY = H - base * 0.02;
-    dangerY = base * 0.30;
+    dangerY = base * 0.28;
     spawnY = dangerY - base * 0.18;
     pointerX = W / 2;
   }
@@ -480,7 +478,7 @@ html, body {
   }
 
   function randLevel() {
-    const cap = Math.min(3, 1 + Math.floor(score / 60));
+    const cap = Math.min(5, 1 + Math.floor(score / 150));
     return Math.floor(Math.random() * (cap + 1));
   }
 
