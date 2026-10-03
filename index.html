@@ -387,6 +387,21 @@ html, body {
     }).catch(() => {});
   }
 
+  // 后台数据统计：局时长(dur秒)、访问量、结算方式
+  let gameStartTs = 0;
+  function logStat(rec) {
+    if (!FIREBASE_DB_URL) return;
+    try {
+      fetch(FIREBASE_DB_URL + '/stats.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rec),
+        keepalive: true
+      }).catch(() => {});
+    } catch(e) {}
+  }
+  try { logStat({ v: 'visit', t: Date.now() }); } catch(e) {}
+
   function fetchBoard() {
     if (!FIREBASE_DB_URL) return Promise.resolve(null);
     return fetch(FIREBASE_DB_URL + '/' + BOARD_PATH + '.json')
@@ -841,6 +856,8 @@ html, body {
   // 中途退出时保存成绩到 localStorage，下次打开自动提交
   function saveExitScore() {
     if (state !== STATE.PLAYING || score <= 0) return;
+    logStat({ v: 'exit', name: playerName || '神秘玩家', score: score,
+      dur: gameStartTs ? Math.round((Date.now() - gameStartTs) / 1000) : 0, t: Date.now() });
     try {
       localStorage.setItem('syn_exitScore', JSON.stringify({
         name: playerName || '神秘玩家',
@@ -879,6 +896,7 @@ html, body {
     document.getElementById('scoreVal').textContent = '0';
     document.getElementById('highVal').textContent = highScore;
     drawNextPreview();
+    gameStartTs = Date.now();
     state = STATE.PLAYING;
     document.getElementById('menuScreen').classList.remove('active');
     document.getElementById('overScreen').classList.remove('active');
@@ -909,6 +927,8 @@ html, body {
     boardEl.innerHTML = '<div class="board-empty">正在提交成绩...</div>';
     (score > 0 ? submitScore(playerName, score) : Promise.resolve())
       .then(() => fetchBoard()).then(list => renderBoard(boardEl, list, score, playerName));
+    logStat({ v: 'gameover', name: playerName, score: score,
+      dur: gameStartTs ? Math.round((Date.now() - gameStartTs) / 1000) : 0, t: Date.now() });
   }
 
   function handleInput(x) {
