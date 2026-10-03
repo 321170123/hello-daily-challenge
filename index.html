@@ -388,11 +388,12 @@ html, body {
       { r: base * 0.300, img: 2, glow: 'gold' },
       { r: base * 0.358, img: 3, glow: 'gold' },
       { r: base * 0.427, img: 4, glow: 'gold' },
-      { r: base * 0.500, img: 5, glow: 'rainbow' },
+      { r: base * 0.463, img: 5, glow: 'rainbow' },
+      { r: base * 0.500, img: 12, glow: 'rainbow' },
     ];
     groundY = H - base * 0.02;
     dangerY = base * 0.28;
-    spawnY = dangerY - base * 0.18;
+    spawnY = Math.max(dangerY - base * 0.18, 80);
     pointerX = W / 2;
   }
 
@@ -727,7 +728,7 @@ html, body {
       ctx.strokeStyle = '#e67e22';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(sx, 0);
+      ctx.moveTo(sx, 70);
       ctx.lineTo(sx, dangerY);
       ctx.stroke();
       ctx.setLineDash([]);
