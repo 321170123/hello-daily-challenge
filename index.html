@@ -111,21 +111,21 @@ html, body {
 #hud {
   position: absolute;
   top: 0; left: 0; width: 100%;
-  padding: 10px 16px;
+  padding: 4px 8px;
   display: none;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   pointer-events: none;
 }
 #hud.active { display: flex; }
 .hud-box {
-  background: rgba(255,255,255,0.85);
-  padding: 6px 14px;
-  border-radius: 16px;
-  font-size: 14px;
+  background: rgba(255,255,255,0.45);
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 12px;
   color: #333;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 .hud-btn {
   pointer-events: auto;
@@ -137,10 +137,10 @@ html, body {
 #nextPreview {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 #nextCanvas {
-  width: 32px; height: 32px;
+  width: 24px; height: 24px;
 }
 .new-record {
   color: #e74c3c;
@@ -300,6 +300,12 @@ html, body {
   let groundY = 0;
   let dangerY = 0;
   let spawnY = 0;
+  const HUD_H = 44; // 顶部栏高度，投球区从其下方开始
+
+  // 球的出生/预览高度：保证整球在顶部栏之下
+  function ballSpawnY(r) {
+    return Math.max(spawnY, HUD_H + r + 4);
+  }
   let audioCtx = null;
   let animId = 0;
   let playerName = '';
@@ -393,7 +399,7 @@ html, body {
     ];
     groundY = H - base * 0.02;
     dangerY = base * 0.28;
-    spawnY = Math.max(dangerY - base * 0.18, 80);
+    spawnY = Math.max(dangerY - base * 0.18, 50);
     pointerX = W / 2;
   }
 
@@ -489,7 +495,7 @@ html, body {
     dropCooldown = 0.5;
     const r = LEVELS[currentLevel].r;
     x = Math.max(r, Math.min(W - r, x));
-    const b = new Ball(x, spawnY, currentLevel);
+    const b = new Ball(x, ballSpawnY(r), currentLevel);
     b.vy = 30;
     balls.push(b);
     currentLevel = nextLevel;
@@ -728,11 +734,11 @@ html, body {
       ctx.strokeStyle = '#e67e22';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(sx, 70);
+      ctx.moveTo(sx, HUD_H);
       ctx.lineTo(sx, dangerY);
       ctx.stroke();
       ctx.setLineDash([]);
-      drawBall(ctx, { x: sx, y: spawnY, level: currentLevel, r: rr }, 0.55);
+      drawBall(ctx, { x: sx, y: ballSpawnY(rr), level: currentLevel, r: rr }, 0.55);
       ctx.restore();
     }
 
