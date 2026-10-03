@@ -357,7 +357,8 @@ html, body {
       const isMe = !highlighted && myScore != null && myName != null && e.score === myScore && e.name === myName;
       if (isMe) highlighted = true;
       const style = isMe ? ' style="background:#fff3d6;font-weight:800;"' : '';
-      return '<div class="board-row"' + style + '><span class="rank">' + (i+1) + '</span><span class="name">' + escHtml(e.name) + '</span><span class="pts">' + e.score + '</span></div>';
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+      return '<div class="board-row"' + style + '><span class="rank">' + medal + '</span><span class="name">' + escHtml(e.name) + '</span><span class="pts">' + e.score + '</span></div>';
     }).join('');
     el.innerHTML = html;
   }
