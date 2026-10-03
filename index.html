@@ -142,6 +142,52 @@ html, body {
 #nextCanvas {
   width: 24px; height: 24px;
 }
+.chain-title {
+  font-size: 13px;
+  color: #8a6d3b;
+  font-weight: 700;
+  margin: 10px 0 4px;
+}
+.chain {
+  display: flex;
+  overflow-x: auto;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 6px 4px;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+.chain-item {
+  flex: 0 0 auto;
+  text-align: center;
+  position: relative;
+}
+.chain-item::after {
+  content: '›';
+  position: absolute;
+  right: -5px;
+  top: 14px;
+  color: #bbb;
+  font-size: 14px;
+}
+.chain-item:last-child::after { content: ''; }
+.chain-ball {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-sizing: border-box;
+  background: #fff;
+}
+.chain-ball.gold { border: 3px solid #ffc300; }
+.chain-rainbow {
+  display: inline-block;
+  padding: 3px;
+  border-radius: 50%;
+  background: conic-gradient(#ff004c, #ff8a00, #ffee00, #00c853, #2979ff, #aa00ff, #ff004c);
+}
+.chain-rainbow .chain-ball { width: 34px; height: 34px; }
+.chain-lv { font-size: 10px; color: #999; margin-top: 2px; }
 .new-record {
   color: #e74c3c;
   font-weight: 800;
@@ -269,6 +315,8 @@ html, body {
   <div id="boardScreen" class="screen">
     <div class="title">排行榜</div>
     <div id="menuBoard" class="board board-large"></div>
+    <div class="chain-title">合成链（共18级，相同合成下一级）</div>
+    <div id="chainStrip" class="chain"></div>
     <button class="btn" id="boardBackBtn">返回</button>
   </div>
 </div>
@@ -401,6 +449,18 @@ html, body {
     dangerY = base * 0.28;
     spawnY = Math.max(dangerY - base * 0.18, 50);
     pointerX = W / 2;
+    buildChain();
+  }
+
+  function buildChain() {
+    const strip = document.getElementById('chainStrip');
+    if (!strip) return;
+    strip.innerHTML = LEVELS.map((lv, i) => {
+      const src = 'assets/p' + lv.img + '.jpg';
+      const ball = '<img class="chain-ball' + (lv.glow === 'gold' ? ' gold' : '') + '" src="' + src + '">';
+      const inner = lv.glow === 'rainbow' ? '<span class="chain-rainbow">' + ball + '</span>' : ball;
+      return '<div class="chain-item">' + inner + '<div class="chain-lv">Lv.' + (i + 1) + '</div></div>';
+    }).join('');
   }
 
   function initAudio() {
