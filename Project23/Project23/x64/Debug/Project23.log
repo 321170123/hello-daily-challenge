@@ -1,3 +1,0 @@
-﻿  源2.c
-H:\Vs26\Project23\Project23\源2.c(10,8): warning C4244: “函数”: 从“time_t”转换到“unsigned int”，可能丢失数据
-  Project23.vcxproj -> H:\Vs26\Project23\x64\Debug\Project23.exe
