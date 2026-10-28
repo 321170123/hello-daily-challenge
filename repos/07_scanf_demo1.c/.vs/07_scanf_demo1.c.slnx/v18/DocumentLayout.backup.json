@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\90830\\source\\repos\\07_scanf_demo1.c\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E59CF119-06E0-4D77-ADDD-B22C5B6EE0B1}|07_scanf_demo1.c\\07_scanf_demo1.c.vcxproj|C:\\Users\\90830\\source\\repos\\07_scanf_demo1.c\\07_scanf_demo1.c\\07_scanf_demo1.c.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{E59CF119-06E0-4D77-ADDD-B22C5B6EE0B1}|07_scanf_demo1.c\\07_scanf_demo1.c.vcxproj|solutionrelative:07_scanf_demo1.c\\07_scanf_demo1.c.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "07_scanf_demo1.c.cpp",
+              "DocumentMoniker": "C:\\Users\\90830\\source\\repos\\07_scanf_demo1.c\\07_scanf_demo1.c\\07_scanf_demo1.c.cpp",
+              "RelativeDocumentMoniker": "07_scanf_demo1.c\\07_scanf_demo1.c.cpp",
+              "ToolTip": "C:\\Users\\90830\\source\\repos\\07_scanf_demo1.c\\07_scanf_demo1.c\\07_scanf_demo1.c.cpp",
+              "RelativeToolTip": "07_scanf_demo1.c\\07_scanf_demo1.c.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-08-12T12:29:11.309Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
