@@ -1,0 +1,6 @@
+﻿  03_variable_demo.c.cpp
+C:\Users\90830\source\repos\03_variable_demo.c\03_variable_demo.c\03_variable_demo.c.cpp(4,1): error C2447: “{”: 缺少函数标题(是否是老式的形式表?)
+C:\Users\90830\source\repos\03_variable_demo.c\03_variable_demo.c\03_variable_demo.c.cpp(34,1): error C1004: 发现意外的文件尾
+  04_variable_demo.cpp
+C:\Users\90830\source\repos\03_variable_demo.c\03_variable_demo.c\04_variable_demo.cpp(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+  正在生成代码...
