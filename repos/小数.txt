@@ -1,0 +1,9 @@
+﻿生成开始于 18:08...
+1>------ 已启动生成: 项目: ConsoleApplication2, 配置: Debug x64 ------
+1>  ConsoleApplication2.cpp
+1>C:\Users\90830\source\repos\ConsoleApplication2\ConsoleApplication2\ConsoleApplication2.cpp(24,12): warning C4076: "unsigned": 不能与类型 "double" 一起使用
+1>C:\Users\90830\source\repos\ConsoleApplication2\ConsoleApplication2\ConsoleApplication2.cpp(24,21): warning C4244: “初始化”: 从“double”转换到“unsigned int”，可能丢失数据
+1>C:\Users\90830\source\repos\ConsoleApplication2\ConsoleApplication2\ConsoleApplication2.cpp(25,9): warning C4477: “printf”: 格式字符串“%.2lf”需要类型“double”的参数，但可变参数 1 拥有了类型“unsigned int”
+1>  ConsoleApplication2.vcxproj -> C:\Users\90830\source\repos\ConsoleApplication2\x64\Debug\ConsoleApplication2.exe
+========== 生成: 1 成功，0 失败，0 最新，0 已跳过 ==========
+========== 生成 于 18:08 完成，耗时 01.018 秒 ==========
