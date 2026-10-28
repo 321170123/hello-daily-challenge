@@ -1,0 +1,54 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\90830\\source\\repos\\03_variable_demo.c\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A65EA9B0-0659-462A-8BCE-0162245D21E8}|03_variable_demo.c\\03_variable_demo.c.vcxproj|C:\\Users\\90830\\source\\repos\\03_variable_demo.c\\03_variable_demo.c\\04_variable_demo.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A65EA9B0-0659-462A-8BCE-0162245D21E8}|03_variable_demo.c\\03_variable_demo.c.vcxproj|solutionrelative:03_variable_demo.c\\04_variable_demo.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A65EA9B0-0659-462A-8BCE-0162245D21E8}|03_variable_demo.c\\03_variable_demo.c.vcxproj|C:\\Users\\90830\\source\\repos\\03_variable_demo.c\\03_variable_demo.c\\03_variable_demo.c.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A65EA9B0-0659-462A-8BCE-0162245D21E8}|03_variable_demo.c\\03_variable_demo.c.vcxproj|solutionrelative:03_variable_demo.c\\03_variable_demo.c.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "04_variable_demo.cpp",
+              "DocumentMoniker": "C:\\Users\\90830\\source\\repos\\03_variable_demo.c\\03_variable_demo.c\\04_variable_demo.cpp",
+              "RelativeDocumentMoniker": "03_variable_demo.c\\04_variable_demo.cpp",
+              "ToolTip": "C:\\Users\\90830\\source\\repos\\03_variable_demo.c\\03_variable_demo.c\\04_variable_demo.cpp",
+              "RelativeToolTip": "03_variable_demo.c\\04_variable_demo.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-08-02T03:46:31.278Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "03_variable_demo.c.cpp",
+              "DocumentMoniker": "C:\\Users\\90830\\source\\repos\\03_variable_demo.c\\03_variable_demo.c\\03_variable_demo.c.cpp",
+              "RelativeDocumentMoniker": "03_variable_demo.c\\03_variable_demo.c.cpp",
+              "ToolTip": "C:\\Users\\90830\\source\\repos\\03_variable_demo.c\\03_variable_demo.c\\03_variable_demo.c.cpp",
+              "RelativeToolTip": "03_variable_demo.c\\03_variable_demo.c.cpp",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAACAAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-08-02T02:07:17.609Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
