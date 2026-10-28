@@ -1,0 +1,8 @@
+﻿生成开始于 15:58...
+1>------ 已启动生成: 项目: HelloWorld, 配置: Debug x64 ------
+1>D:\develop\vs2022\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(551,5): warning MSB8028: 中间目录(x64\Debug\)包含从另一个项目(HelloWord.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。
+1>  constant.c
+1>C:\Users\90830\source\repos\HelloWord\HelloWord\constant.c(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+1>  HelloWord.vcxproj -> C:\Users\90830\source\repos\HelloWord\x64\Debug\HelloWorld.exe
+========== 生成: 1 成功，0 失败，0 最新，0 已跳过 ==========
+========== 生成 于 15:59 完成，耗时 00.925 秒 ==========
