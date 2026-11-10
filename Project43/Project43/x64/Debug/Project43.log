@@ -1,0 +1,23 @@
+﻿  7.1.c
+  7.2.c
+  7.6.c
+  正在生成代码...
+H:\Vs26\Project43\Project43\7.6.c(8,10): warning C4473: “scanf_s”: 没有为格式字符串传递足够的参数
+      H:\Vs26\Project43\Project43\7.6.c(8,10):
+      占位符和其参数预计 2 可变参数，但提供的却是 1 参数
+      H:\Vs26\Project43\Project43\7.6.c(8,10):
+      缺失的可变参数 2 为格式字符串“%s”所需
+      H:\Vs26\Project43\Project43\7.6.c(8,10):
+      此参数用作缓冲区大小
+  
+H:\Vs26\Project43\Project43\7.6.c(10,10): warning C4473: “scanf_s”: 没有为格式字符串传递足够的参数
+      H:\Vs26\Project43\Project43\7.6.c(10,10):
+      占位符和其参数预计 2 可变参数，但提供的却是 1 参数
+      H:\Vs26\Project43\Project43\7.6.c(10,10):
+      缺失的可变参数 2 为格式字符串“%s”所需
+      H:\Vs26\Project43\Project43\7.6.c(10,10):
+      此参数用作缓冲区大小
+  
+7.2.obj : error LNK2005: main 已经在 7.1.obj 中定义
+7.6.obj : error LNK2005: main 已经在 7.1.obj 中定义
+H:\Vs26\Project43\x64\Debug\Project43.exe : fatal error LNK1169: 找到一个或多个多重定义的符号
