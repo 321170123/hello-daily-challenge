@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="08_scanf_demo2.c/08_scanf_demo2.c.vcxproj" />
+</Solution>
