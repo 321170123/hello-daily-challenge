@@ -1,0 +1,8 @@
+# Visual Studio build artifacts
+bin/
+obj/
+.vs/
+Debug/
+Release/
+*.user
+*.suo
